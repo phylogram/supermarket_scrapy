@@ -1,0 +1,42 @@
+---
+- hosts: default
+  remote_user: root
+  vars:
+    timezone: "Europe/Vienna"
+    virtualenv_path: ~vagrant/env
+    workdir: ~vagrant/hostdir
+  tasks:
+
+# -------- update --------------------------------------------
+  - name: update apt cache
+    apt: update_cache=yes
+
+# -------- environment ---------------------------------------
+  - name: ensure OS environment
+    apt: name={{ item }} state=present install_recommends=no
+    with_items:
+      - build-essential
+      - postgresql
+      - libpq-dev
+      - python
+      - python-setuptools
+      - python-pip
+      - python3
+      - python3-setuptools
+      - python3-venv
+      - python3-pip
+      - python3-dev
+  - name: update pip
+    pip: name=pip virtualenv={{ virtualenv_path }} virtualenv_command=pyvenv-3.4
+    become: true
+    become_user: vagrant
+  - name: install app requirements
+    pip: requirements={{ workdir }}/requirements/dev.txt virtualenv={{ virtualenv_path }} virtualenv_command=pyvenv-3.4
+    become: true
+    become_user: vagrant
+
+# -------- shell ---------------------------------------------
+  - name: .bashrc for vagrant user
+    template: dest=~vagrant/.bashrc src=templates/etc/skel/.bashrc.j2 mode=0644 owner=vagrant group=vagrant
+  - name: set unicode shell env
+    copy: dest=/etc/default/locale src=files/etc/default/locale mode=0644 owner=root group=root
