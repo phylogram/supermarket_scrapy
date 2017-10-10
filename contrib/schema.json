@@ -1,0 +1,60 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "title": "Product set",
+    "type": "array",
+    "items": {
+        "title": "Product",
+        "type": "object",
+        "properties": {
+            "name": {
+                "description": "The name of the product (required)",
+                "type": "string"
+            },
+            "brand": {
+                "description": "The brand of a product (optional)",
+                "type": "string"
+            },
+            "producer": {
+                "description": "The producing company (optional)",
+                "type": "string"
+            },
+            "category": {
+                "description": "The producing company (optional)",
+                "type": "string"
+            },
+            "store": {
+                "description": "The store (optional)",
+                "type": "string"
+            },
+            "gtin": {
+                "description": "The Global Trade Item Number (optional)",
+                "type": "string"
+            },
+            "labels": {
+                "type": "array",
+                "items": {
+                    "type": "string"
+                },
+                "uniqueItems": true
+            },
+            "ingredients": {
+                "type": "array",
+                "items": {
+                    "anyOf": [
+                        { "type": "string"},
+                        {
+                            "type": "object",
+                            "properties": {
+                                "name": {"type": "string"},
+                                "resource": {"type": "string"}
+                            },
+                            "required": ["name", "resource"]
+                        }
+                    ]
+                },
+                "uniqueItems": true
+            }
+        },
+        "required": ["name"]
+    }
+}

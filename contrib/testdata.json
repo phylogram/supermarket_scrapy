@@ -1,0 +1,19 @@
+[
+   {
+     "name": "My Product",
+     "brand": "My Brand",
+     "store": "My Store",
+     "producter": "My Producer",
+     "labels": [
+       "BEPI",
+       "BSCI"
+     ],
+     "ingredients": [
+       "Milk",
+       {
+         "name": "Cacoa butter",
+         "resource": "Cacoa"
+       }
+     ]
+   }
+]

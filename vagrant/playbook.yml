@@ -40,3 +40,8 @@
     template: dest=~vagrant/.bashrc src=templates/etc/skel/.bashrc.j2 mode=0644 owner=vagrant group=vagrant
   - name: set unicode shell env
     copy: dest=/etc/default/locale src=files/etc/default/locale mode=0644 owner=root group=root
+
+  - name: install jsonschema
+    pip: name=jsonschema virtualenv={{ virtualenv_path }} virtualenv_command=pyvenv-3.4
+    become: true
+    become_user: vagrant
