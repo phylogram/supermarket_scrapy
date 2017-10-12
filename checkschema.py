@@ -23,7 +23,9 @@ def _read_as_list(file_path):
 @click.option('--brands-file', type=click.Path(exists=True), default=None)
 @click.option('--check-labels/--no-check-labels', default=True)
 @click.option('--labels-file', type=click.Path(exists=True), default=None)
-def validate(schema_file, data_file, check_brands, brands_file, check_labels, labels_file):
+@click.option('--check-resources/--no-check-resources', default=True)
+@click.option('--resources-file', type=click.Path(exists=True), default=None)
+def validate(schema_file, data_file, check_brands, brands_file, check_labels, labels_file, check_resources, resources_file):
     schema = {}
     with open(schema_file, 'r') as stream:
         schema = json.load(stream)
@@ -55,6 +57,18 @@ def validate(schema_file, data_file, check_brands, brands_file, check_labels, la
 
         schema['items']['properties']['labels']['items']['enum'] = labels
         print("Labels: {}".format(labels))
+
+    if not check_resources:
+        print(click.style("Not checking resources...", fg='yellow'))
+    else:
+        print(click.style("Checking resources...", fg='green'))
+        if resources_file:
+            resources = _read_as_list(resources_file)
+        else:
+            resources = []
+
+        schema['items']['properties']['ingredients']['items']['anyOf'][1]['properties']['resource']['enum'] = resources
+        print("Resources: {}".format(resources))
 
     # Validate!
     jsonschema.validate(data, schema)
