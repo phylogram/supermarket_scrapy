@@ -3,10 +3,25 @@ import json
 import jsonschema
 
 
+def _read_as_list(file_path):
+    """return lines as list
+
+    filter comments (starting with '#') and empty strings
+    """
+    lines = []
+
+    with open(file_path, 'r') as stream:
+        lines = [line.strip() for line in stream if not line.startswith('#')]
+
+    return list(filter(None, lines))
+
+
 @click.command()
 @click.option('--schema-file', type=click.Path(exists=True), required=True)
 @click.option('--data-file', type=click.Path(exists=True), required=True)
-def validate(schema_file, data_file):
+@click.option('--check-brands/--no-check-brands', default=True)
+@click.option('--brands-file', type=click.Path(exists=True), default=None)
+def validate(schema_file, data_file, check_brands, brands_file):
     schema = {}
     with open(schema_file, 'r') as stream:
         schema = json.load(stream)
@@ -14,6 +29,19 @@ def validate(schema_file, data_file):
     data = {}
     with open(data_file, 'r') as stream:
         data = json.load(stream)
+
+    if not check_brands:
+        print(click.style("Not checking brands...", fg='yellow'))
+    else:
+        print(click.style("Checking brands...", fg='green'))
+        if brands_file:
+            brands = _read_as_list(brands_file)
+        else:
+            brands = []
+
+        schema['items']['properties']['brand']['enum'] = brands
+        print("Brands: {}".format(brands))
+
 
     jsonschema.validate(data, schema)
 
