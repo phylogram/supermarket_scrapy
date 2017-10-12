@@ -21,7 +21,9 @@ def _read_as_list(file_path):
 @click.option('--data-file', type=click.Path(exists=True), required=True)
 @click.option('--check-brands/--no-check-brands', default=True)
 @click.option('--brands-file', type=click.Path(exists=True), default=None)
-def validate(schema_file, data_file, check_brands, brands_file):
+@click.option('--check-labels/--no-check-labels', default=True)
+@click.option('--labels-file', type=click.Path(exists=True), default=None)
+def validate(schema_file, data_file, check_brands, brands_file, check_labels, labels_file):
     schema = {}
     with open(schema_file, 'r') as stream:
         schema = json.load(stream)
@@ -42,7 +44,19 @@ def validate(schema_file, data_file, check_brands, brands_file):
         schema['items']['properties']['brand']['enum'] = brands
         print("Brands: {}".format(brands))
 
+    if not check_labels:
+        print(click.style("Not checking labels...", fg='yellow'))
+    else:
+        print(click.style("Checking labels...", fg='green'))
+        if labels_file:
+            labels = _read_as_list(labels_file)
+        else:
+            labels = []
 
+        schema['items']['properties']['labels']['items']['enum'] = labels
+        print("Labels: {}".format(labels))
+
+    # Validate!
     jsonschema.validate(data, schema)
 
 
