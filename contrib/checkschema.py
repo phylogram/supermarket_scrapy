@@ -4,13 +4,15 @@ import jsonschema
 
 
 @click.command()
-def validate():
+@click.option('--schema-file', type=click.Path(exists=True), required=True)
+@click.option('--data-file', type=click.Path(exists=True), required=True)
+def validate(schema_file, data_file):
     schema = {}
-    with open('schema.json', 'r') as stream:
+    with open(schema_file, 'r') as stream:
         schema = json.load(stream)
 
     data = {}
-    with open('testdata.json', 'r') as stream:
+    with open(data_file, 'r') as stream:
         data = json.load(stream)
 
     jsonschema.validate(data, schema)
