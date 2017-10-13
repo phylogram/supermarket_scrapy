@@ -10,6 +10,44 @@
                 "description": "The name of the product (required)",
                 "type": "string"
             },
+            "ingredients": {
+                "description": "The ingredients ordered by their relative weight, same as on the product packaging (required)",
+                "type": "array",
+                "items": {
+                    "anyOf": [
+                        { "type": "string"},
+                        {
+                            "type": "object",
+                            "properties": {
+                                "name":     {"type": "string"},
+                                "resource": {"type": "string"}
+                            },
+                            "required": ["name", "resource"]
+                        }
+                    ]
+                },
+                "uniqueItems": true
+            },
+            "labels": {
+                "description": "Labels on the product (required)",
+                "type": ["array", "null"],
+                "items": {
+                    "type": "string"
+                },
+                "uniqueItems": true
+            },
+            "stores": {
+                "description": "Store(s) selling the product (required)",
+                "type": "array",
+                "items": {
+                    "type": "string"
+                },
+                "uniqueItems": true
+            },
+            "gtin": {
+                "description": "The Global Trade Item Number or barcode (optional)",
+                "type": "string"
+            },
             "brand": {
                 "description": "The brand of a product (optional)",
                 "type": "string"
@@ -19,42 +57,20 @@
                 "type": "string"
             },
             "category": {
-                "description": "The producing company (optional)",
+                "description": "The product category, ideally conforming to GS1 standards (optional)",
                 "type": "string"
             },
-            "store": {
-                "description": "The store (optional)",
-                "type": "string"
-            },
-            "gtin": {
-                "description": "The Global Trade Item Number (optional)",
-                "type": "string"
-            },
-            "labels": {
-                "type": "array",
-                "items": {
-                    "type": "string"
+            "details": {
+                "description": "Any extra information (optional)",
+                "type": "object",
+                "properties": {
+                    "weight":    { "type": "string" },
+                    "price":     { "type": "string" },
+                    "image_url": { "type": "string" }
                 },
-                "uniqueItems": true
-            },
-            "ingredients": {
-                "type": "array",
-                "items": {
-                    "anyOf": [
-                        { "type": "string"},
-                        {
-                            "type": "object",
-                            "properties": {
-                                "name": {"type": "string"},
-                                "resource": {"type": "string"}
-                            },
-                            "required": ["name", "resource"]
-                        }
-                    ]
-                },
-                "uniqueItems": true
+                "additionalProperties": true
             }
         },
-        "required": ["name"]
+        "required": ["name", "ingredients", "labels", "stores"]
     }
 }
