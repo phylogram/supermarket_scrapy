@@ -15,5 +15,20 @@
          "resource": "Cacoa"
        }
      ]
+   },
+   {
+     "name": "Another Product",
+     "brand": "My second Brand",
+     "store": "My Store",
+     "producer": "My Producer",
+     "labels": [
+       "Fair Trade"
+     ],
+     "ingredients": [
+       {
+         "name": "Silk",
+         "resource": "Silk"
+       }
+     ]
    }
 ]
