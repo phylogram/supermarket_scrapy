@@ -25,6 +25,11 @@
       - python3-venv
       - python3-pip
       - python3-dev
+      - man-db
+      - manpages
+      - jq
+      - chromium-driver
+      - chromium
   - name: update pip
     pip: name=pip virtualenv={{ virtualenv_path }} virtualenv_command=pyvenv-3.5
     become: true
@@ -35,6 +40,11 @@
     with_items:
       - click
       - jsonschema
+      - wheel
+      - scrapy
+      - selenium
+      - ipython
+      - beautifulsoup4
     become: true
     become_user: vagrant
 
