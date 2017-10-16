@@ -19,11 +19,11 @@ def _read_as_list(file_path):
 @click.command()
 @click.option('--schema-file', type=click.Path(exists=True), required=True)
 @click.option('--data-file', type=click.Path(exists=True), required=True)
-@click.option('--check-brands/--no-check-brands', default=True)
+@click.option('--check-brands/--no-check-brands', default=False)
 @click.option('--brands-file', type=click.Path(exists=True), default=None)
-@click.option('--check-labels/--no-check-labels', default=True)
+@click.option('--check-labels/--no-check-labels', default=False)
 @click.option('--labels-file', type=click.Path(exists=True), default=None)
-@click.option('--check-resources/--no-check-resources', default=True)
+@click.option('--check-resources/--no-check-resources', default=False)
 @click.option('--resources-file', type=click.Path(exists=True), default=None)
 def validate(schema_file, data_file, check_brands, brands_file, check_labels, labels_file, check_resources, resources_file):
     schema = {}
