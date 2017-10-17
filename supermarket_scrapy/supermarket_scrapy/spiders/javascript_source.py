@@ -35,10 +35,16 @@ class JavascriptSourceSpider(scrapy.Spider):
         # address the desired element
         name = sel.xpath('/html/body/form/div[13]/div[2]/div[1]/div/div[1]/div[2]/div[2]/h1/text()').extract_first()
         ingredients = sel.xpath('/html/body/form/div[13]/div[2]/div[1]/div/div[1]/div[4]/div[2]/ul/li/text()').extract()
+        image_src = sel.xpath('/html/body/form/div[13]/div[2]/div[1]/div/div[1]/div[2]/div[1]/img/@src').extract_first()
 
         # emit the result for scrapy to output
         yield {
             'name': name,
             'brand': "Ja! Natürlich",
-            'ingredients': ingredients
+            'ingredients': ingredients,
+            'labels': ['EU Organic'],
+            'stores': ["Billa", "Merkur"],
+            'details': {
+                'image_url': image_src
+            }
         }
