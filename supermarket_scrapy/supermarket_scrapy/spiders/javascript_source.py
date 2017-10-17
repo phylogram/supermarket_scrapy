@@ -42,7 +42,7 @@ class JavascriptSourceSpider(scrapy.Spider):
             'name': name,
             'brand': "Ja! Natürlich",
             'ingredients': ingredients,
-            'labels': ['EU Organic'],
+            'labels': ["Ja Natürlich"],
             'stores': ["Billa", "Merkur"],
             'details': {
                 'image_url': image_src
