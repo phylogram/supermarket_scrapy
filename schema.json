@@ -64,8 +64,20 @@
                 "description": "Any extra information (optional)",
                 "type": "object",
                 "properties": {
-                    "weight":    { "type": "string" },
-                    "price":     { "type": "string" },
+                    "size": {
+                        "type": "object",
+                        "properties": {
+                            "amount": { "type": "number" },
+                            "unit":   { "type": "string" }
+                        }
+                    },
+                    "price": {
+                        "type": "object",
+                        "properties": {
+                            "amount":   { "type": "number" },
+                            "currency": { "type": "string" }
+                        }
+                    },
                     "image_url": { "type": "string" }
                 },
                 "additionalProperties": true

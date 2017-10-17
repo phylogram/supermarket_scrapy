@@ -1,34 +1,43 @@
 [
-   {
-     "name": "My Product",
-     "brand": "My Brand",
-     "store": "My Store",
-     "producer": "My Producer",
-     "labels": [
-       "BEPI",
-       "BSCI"
-     ],
-     "ingredients": [
-       "Milk",
-       {
-         "name": "Cacoa butter",
-         "resource": "Cacoa"
-       }
-     ]
-   },
-   {
-     "name": "Another Product",
-     "brand": "My second Brand",
-     "store": "My Store",
-     "producer": "My Producer",
-     "labels": [
-       "Fair Trade"
-     ],
-     "ingredients": [
-       {
-         "name": "Silk",
-         "resource": "Silk"
-       }
-     ]
-   }
+  {
+    "name": "My Product",
+    "brand": "My Brand",
+    "stores": ["My Store"],
+    "producer": "My Producer",
+    "labels": [
+      "BEPI",
+      "BSCI"
+    ],
+    "ingredients": [
+      "Milk",
+      {
+        "name": "Cacoa butter",
+        "resource": "Cacoa"
+      }
+    ],
+    "details": {
+      "size": {
+        "amount": 250,
+        "unit": "ml"
+      },
+      "price": {
+        "amount": 1.25,
+        "currency": "EUR"
+      },
+      "image_url": "https://cdn.example.com/images/product.png"
+    }
+  },
+  {
+    "name": "Another Product",
+    "brand": "My second Brand",
+    "stores": ["My Store"],
+    "producer": "My Producer",
+    "labels": [],
+    "ingredients": [
+      {
+        "name": "Silk",
+        "resource": "Silk"
+      }
+    ]
+  }
 ]
