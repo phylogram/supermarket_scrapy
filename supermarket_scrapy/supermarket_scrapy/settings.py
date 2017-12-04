@@ -52,9 +52,14 @@ ROBOTSTXT_OBEY = True
 
 # Enable or disable downloader middlewares
 # See http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html
-#DOWNLOADER_MIDDLEWARES = {
-#    'supermarket_scrapy.middlewares.MyCustomDownloaderMiddleware': 543,
-#}
+DOWNLOADER_MIDDLEWARES = {
+    'supermarket_scrapy.middlewares.skipNonProductsMeinDM': 543,
+    'supermarket_scrapy.middlewares.useChrome': 999, # This needs to be the last, because
+    'supermarket_scrapy.middlewares.UseChromePostalCodes': 998, # it actually sends responses
+    'supermarket_scrapy.middlewares.MyTimeShopFilter': 547,
+    'supermarket_scrapy.middlewares.EdekaFilter': 548,
+    'supermarket_scrapy.middlewares.BillaShopFilter': 549,
+}
 
 # Enable or disable extensions
 # See http://scrapy.readthedocs.org/en/latest/topics/extensions.html
