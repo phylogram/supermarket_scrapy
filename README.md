@@ -1,85 +1,131 @@
-# Install!
+# Before you start
 
-    host# apt-get install --no-install-recommends vagrant ansible virtualbox
+## Abstract Shop Spider
 
-# Setup!
+Besides the scrapy parents Spider and SitemapSpider, allof the new spiders have the 
+AbstractShopSpider as parent, where the main functionallity for the json schema is 
+provided. This class is not really abstract though.
 
-    host$ vagrant up --provider=virtualbox
-    host$ vagrant ssh
+## What Do you need:
 
-# Scrape!
+Often selenium & chrome. For amazon we need to read image text with tesseract and German
+language training data (https://github.com/tesseract-ocr/tesseract/wiki).
 
-We recommended using `scrapy`. It is installed in the box.
+### MeinDMatShopSpider
+* type = Sitemap
+* name = 'MeinDMatShop'
+* sitemap_urls = ['https://www.meindm.at/nl/sitemap/sitemap-shop.xml']
+* allowed_domains = ['meindm.at']
 
-`scrapy` is a scraping *framework*: it lets you build and run spiders.
-It can also output the results into a JSON file.
+* Needs: Downloader Middleware: 'supermarket_scrapy.middlewares.skipNonProductsMeinDM'
 
-By default the `scrapy` scrapers work on the source HTML it gets from the
-server, not the computed HTML i.e. any JavaScript magic would not have been
-applied.
+### LebensmittelShopSpider
+* type = Spider
+* name = 'LebensmittelShop'
+* start_urls = ['https://www.lebensmittel.de/?subd=0']
+* store = 'Lebensmittel.de'
 
-You yan work around this by using `chrome` in headless mode (also installed in
-the box). See the example `javascript_source` in the
-`supermarket_scrapy/supermarket_scrapy/spiders/` directory.
+### AlnaturaShopSpider
+* type = Sitemap
+* name = 'AlnaturaShop'
+* sitemap_urls = ['https://www.alnatura-shop.de/medias/PRODUCT-de-EUR-479627737118262662.xml?context=bWFzdGVyfHJvb3R8NzI2MDI1fHRleHQveG1sfGhkOS9oZTcvOTA5NjQ3ODU4ODk1OC54bWx8N2JmNzFlOWQxM2Q3YTAwMWQ5MzFiOTk1NGQ0OTdjMGVhYWE0YTBiY2U5YmYyNDJkNzkyNTZmODhkNTlmNWMwNQ']
+* store = 'Alnatura'
 
-For more resources on `scrapy` see:
-https://doc.scrapy.org/en/latest/intro/tutorial.html
+### KauflandShopSpider
+* type = Spider
+* name = 'KauflandShop'
+* start_urls = ['https://shop.kaufland.de/search?sort=relevance&pageSize=48&source=search']
+* allowed_domains = ['shop.kaufland.de']
 
-## Tasks
+### DMShopSpider
+* type = Spider
+* name = 'DMShop'
+* store = 'dm'
+* start_urls = ['https://www.dm.de/']
+* allowed_domains = ['dm.de']
 
-* Link discovery
-* Automatically crawl the page, beginning from a start page, automatically
-  finding the next page
-* XPath or CSS selections of the needed page contents
-* Clean the data from leading/trailing whitespace
-* UTF-8 conversions
-* Split the data strings into parts if necessary
-* Map ingredients to resources
-* Search for labels
+### EdekaShopSpider
+* type = sitemap
+name = 'EdekaShop'
+sitemap_urls = ['https://www.edeka24.de/sitemaps/sitemap_0-products-0.xml']
+store = 'Edeka'
 
-## Hints
+* Needs: Downloader Middleware: 'supermarket_scrapy.middlewares.EdekaFilter'
 
-* Explore an URL with `scrapy shell 'https://example.com'`
-* Use and share middlewares and pipelines
-* Use "Copy XPath" from the browser
+### BillaShopSpider
+* type = Sitemap
+* name = 'BillaShop'
+* sitemap_urls = ['https://shop.billa.at/sitemap']
+* store = ['Billa']
 
-# Validate!
+* Needs: Downloader Middleware: 'supermarket_scrapy.middlewares.BillaShopFilter'
+* Needs: Downloader Middleware: 'supermarket_scrapy.middlewares.useChrome'
+* Needs: selenium Chrome
 
-    guest$ cd hostdir
-    guest$ python checkschema.py --schema-file schema.json --data-file testdata.json --brands-file brands.list --labels-file labels.list --resources-file resources.list
+*super slow!!!!! *
 
-# Requirements
+chrome warning: A parser blocking cross site script [...] is invoked via document.write.
+The network request MAY be blocked in the browser in this or a future load due to poor 
+network connectivity. [...]
 
-* Chrome or Chromium 59+ for headless mode
-* Firefox 56+ for "Copy XPath" in context menu
-* Python 3
+### AmazonLebensmittelShopSpider
+* type = Spider
+* name = 'AmazonLebensmittelShop'
+# This is the Food – Featured Categories node
+# As far as i understand it, alle food should be in this subcategory
+# Which provides a list of products with pagination
+start_urls = ['https://www.amazon.de/b?node=344162031']
+allowed_domains = ['amazon.de']
+store = ['amazon']
 
-# Example
+#### Needs!
+* Needs: python: PIL.Image
+    * Extern: tesseract with german language training set!
+    https://github.com/tesseract-ocr/tesseract/wiki
+    set tesseractDataPath and tesseractExePath in properties!
 
-  scrape and write JSON file:
+### AllYouNeedFreshShopSpider
+* type = Spider
+* name = 'AllYouNeedFresh'
+* store = 'allyouneedfresh'
+* allowed_domains = ['allyouneedfresh.de']
 
-    cd supermarket-scrapy
-    scrapy crawl javascript_source -o ../data.json
-    cd ..
+* Needs: Downloader Middleware: 'supermarket_scrapy.middlewares.UseChromePostalCodes'
 
-(optional) inspect data e.g. with
+Opens page with various postal codes. For some reason, headless Chrome or Firefox does
+not work (time out). Bug?
 
-    cat data.json | jq
+### LidlShopSpider
+* type = Sitemap
+* name = 'LidlShop'
+* store = ['Lidl']
+* sitemap_urls = ['https://www.lidl.de/robots.txt'] # will lead to sitemap 
+* sitemap_follow =  [re.compile('product', flags=re.IGNORECASE)]
 
-check the schema>
+### MerkurShopSpider
+* type = Sitemap
+* name = 'MerkurShop'
+* sitemap_urls = ['https://www.merkurmarkt.at/sitemap_products.xml']
+* allowed_domains = ['merkurmarkt.at']
+* store = ['Merkur']
 
-    python checkschema.py --schema-file schema.json --data-file data.json --check-brands --brands-file brands.list
-    echo "Ja! Natürlich" >> brands.list
-    python checkschema.py --schema-file schema.json --data-file data.json --check-brands --brands-file brands.list
+* Needs: Downloader Middleware: 'supermarket_scrapy.middlewares.useChrome'
+* Needs: Selenium Chrome
 
-# URLs
+### MyTimeShopSpider
+* type = Sitemap
+* name = 'MyTimeShop'
+* sitemap_urls = ['https://www.mytime.de/sitemap.xml']
+* store = ['myTime.de']
 
-* Scrapy documentation: https://doc.scrapy.org/en/latest/
-* Selenium documentation: https://selenium-python.readthedocs.io/
-* XPath tutorial: https://blog.scrapinghub.com/2016/10/27/an-introduction-to-xpath-with-examples/
-* Headless Chrome: https://developers.google.com/web/updates/2017/04/headless-chrome
-* Headless Chrome and Selenium: https://intoli.com/blog/running-selenium-with-headless-chrome/
+* Needs: Downloader Middleware: 'supermarket_scrapy.middlewares.MyTimeShopFilter'
 
-other suggestions:
+### ReweShopSider
+* type = Spider
+* name = 'ReweShop'
+* start_url = 'https://shop.rewe.de/productList'
 
-* Beautiful Soup "for pulling out data from HTML": https://www.crummy.com/software/BeautifulSoup/bs4/doc/
+* Needs: Downloader middleware: 'supermarket_scrapy.middlewares.UseChromePostalCodes'
+* Needs: Selenium Chrome
+
+Opens page with various postal codes.

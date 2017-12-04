@@ -23,11 +23,12 @@ import supermarket_scrapy.spiders.abstractShopSpider as abstractShopSpider
 class LidlShopSpider(abstractShopSpider.AbstractShopSpider, SitemapSpider):
     name = 'LidlShop'
     store = ['Lidl']
-    selectScriptXPath = 'body/script[1]/text()'
-    scriptSelectRegEx = re.compile('dataLayer\.push.*products\":\[(.*)\]')
     
     sitemap_urls = ['https://www.lidl.de/robots.txt'] # will lead to sitemap 
     sitemap_follow =  [re.compile('product', flags=re.IGNORECASE)]
+    
+    selectScriptXPath = 'body/script[1]/text()'
+    scriptSelectRegEx = re.compile('dataLayer\.push.*products\":\[(.*)\]')
 
     zutatenRegEx = re.compile('<b>Zutaten:<br><\/b>(.+?)<\/div>')
     decDelimiterRegEx = re.compile('(?<=\d),(?=\d)')
