@@ -71,9 +71,10 @@ network connectivity. [...]
 ### AmazonLebensmittelShopSpider
 * type = Spider
 * name = 'AmazonLebensmittelShop'
-# This is the Food – Featured Categories node
-# As far as i understand it, alle food should be in this subcategory
-# Which provides a list of products with pagination
+
+This is the Food – Featured Categories node
+As far as i understand it, alle food should be in this subcategory
+ Which provides a list of products with pagination
 start_urls = ['https://www.amazon.de/b?node=344162031']
 allowed_domains = ['amazon.de']
 store = ['amazon']
