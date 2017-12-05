@@ -160,6 +160,7 @@ class AbstractShopSpider():
             ingredients = [element.strip() for element in ingredients]
             # getting rid of unwanted dots at the end To Do
             ingredients = list(set(ingredients)) # make them unique
+            ingredients = list(filter(None, ingredients)) # delete empty items
             return ingredients
     
     def cleanString(self, string):
