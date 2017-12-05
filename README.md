@@ -6,6 +6,10 @@ Besides the scrapy parents Spider and SitemapSpider, allof the new spiders have 
 AbstractShopSpider as parent, where the main functionallity for the json schema is 
 provided. This class is not really abstract though.
 
+## Labels ar ./supermarket_scrapy
+
+Retrieves labels from supplychainge and compiles regexes for searching websites
+
 ## What Do you need:
 
 Often selenium & chrome. For amazon we need to read image text with tesseract and German
