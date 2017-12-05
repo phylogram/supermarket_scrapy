@@ -23,7 +23,7 @@ class AlnaturaShopSpider(abstractShopSpider.AbstractShopSpider, SitemapSpider):
         self._setOUTPUT_()    
     
     def parse(self, response):
-        for product in self.parseProduct():
+        for product in self.parseProduct(response):
             yield product
     
     def getName(self, response=None, data=None):
