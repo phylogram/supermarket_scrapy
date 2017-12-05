@@ -59,7 +59,7 @@ class SupermarketScrapySpiderMiddleware(object):
         spider.logger.info('Spider opened: %s' % spider.name)
 
 
-class skipNonProductsMeinDM(): 
+class SkipNonProductsMeinDM(): 
     'filters products for DM'
     categoryURL = 'https://www.meindm.at/ernaehrung/'
     def process_request(self, request, spider):
@@ -72,7 +72,7 @@ class skipNonProductsMeinDM():
         return None
     
 
-class useChrome():
+class UseChrome():
     '''
     get requests from scrapy, uses selenium webdriver and send responses back.
     Does not pass them to scrapy downloaders. Set Spiders Names in self.spiderNames
