@@ -21,6 +21,11 @@ class AbstractShopSpider():
     labels = supermarket_scrapy.labels.labels
     listOutputDirectory = '.'
     
+    whiteSpaceRegEx = re.compile('[\s]')
+    htmlTagRegEx = re.compile('<\/*?\w.+?>')
+    
+    decimalSepRegEx = re.compile('(?<=\d),(?=\d)')
+    splitIngredientsRegEx = re.compile(',\s*(?![^()]*\))')
     #there is a german unit -> abbrevation dictionary as property at the end of the class
     
     def _setOUTPUT_(self):  
@@ -78,20 +83,23 @@ class AbstractShopSpider():
         if size:
             parsedDict['details']['size'] = dict()
             if 'amount' in size:
-                amount = self.cleanString(size['amount'])
-                amount = float(amount)
-                parsedDict['details']['size']['amount'] = amount
+                amount = size['amount']
+                if amount:
+                    amount = self.cleanString(size['amount'])
+                    amount = float(amount)
+                    parsedDict['details']['size']['amount'] = amount
             if 'unit' in size:
-                unit = self.cleanString(size['unit'])
-                parsedDict['details']['size']['unit'] = unit
+                    unit = self.cleanString(size['unit'])
+                    parsedDict['details']['size']['unit'] = unit
                 
         price = self.getPrice(response=response,data=data)
         if price:
            parsedDict['details']['price'] = dict()
            if 'amount' in price:
-               amount = self.cleanString(price['amount'])
-               amount = float(amount)
-               parsedDict['details']['price']['amount'] = amount
+                   amount = price['amount']
+                   amount = self.cleanString(amount)
+                   amount = float(amount)
+                   parsedDict['details']['price']['amount'] = amount
            if 'currency' in price:
                unit = self.cleanString(price['currency'])
                parsedDict['details']['price']['currency'] = unit
@@ -152,12 +160,12 @@ class AbstractShopSpider():
         else:
             ingredientString = str(ingredientString)
             ingredients = ingredientString.replace('*', '')
-            ingredients = re.sub('[\s]', ' ', ingredients)
-            ingredients = re.compile('(?<=\d),(?=\d)').sub('.', ingredients)
-            ingredients = re.sub('<\/*?\w.+?>','', ingredients) # get rid of html tags
+            ingredients = re.sub(self.whiteSpaceRegEx, ' ', ingredients)
+            ingredients = self.decimalSepRegEx.sub('.', ingredients)
+            ingredients = re.sub(self.htmlTagRegEx,'', ingredients) # get rid of html tags
                                                     # only works if not broken!
             ingredients = html.unescape(ingredients)
-            ingredients = re.split(',\s*(?![^()]*\))', ingredients)
+            ingredients = re.split(self.splitIngredientsRegEx, ingredients)
             ingredients = [element.strip() for element in ingredients]
             # getting rid of unwanted dots at the end To Do
             ingredients = list(set(ingredients)) # make them unique
@@ -168,9 +176,10 @@ class AbstractShopSpider():
         'Cleans Strings - html, utf-8 encoding ... '
         if not string:
             return None
-        string = re.sub('[\s]', ' ', string)
+        string = str(string)
+        string = re.sub(self.whiteSpaceRegEx, ' ', string)
         string = html.unescape(string)
-        string = re.sub('<\/*?\w.+?>','', string)
+        string = re.sub(self.htmlTagRegEx, '', string)
         string = codecs.encode(string)
         string = codecs.decode(string, encoding='utf-8', errors='namereplace')
         string = string.strip()
