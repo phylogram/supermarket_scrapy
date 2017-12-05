@@ -127,13 +127,13 @@ class UseChromePostalCodes():
         plz = request.meta['plz']
         if plz in self.browsers:
             browser = self.browsers[plz]
-            self.browser.get(request.url)
+            browser.get(request.url)
             # scroll down the page to get ajax loads
             browser.execute_script("window.scrollTo(0,document.body.scrollHeight);")
         else:
             browser = self.getNewBrowser()
             self.browsers[plz] = browser
-            self.browser.get(request.url)
+            browser.get(request.url)
             if spider.name == 'AllYouNeedIsFresh':
                 form = browser.find_element_by_id('zipCodeForm:zipCode')
                 button = browser.find_element_by_id("zipCodeForm:submit")
@@ -152,8 +152,8 @@ class UseChromePostalCodes():
                 goButton = browser.find_element_by_id('mc-success-trigger')
                 goButton.click()
             
-        response = scrapy.http.HtmlResponse(self.browser.current_url,
-                                            body=self.browser.page_source,
+        response = scrapy.http.HtmlResponse(browser.current_url,
+                                            body=browser.page_source,
                                             encoding='utf-8',
                                             request=request)
         return response

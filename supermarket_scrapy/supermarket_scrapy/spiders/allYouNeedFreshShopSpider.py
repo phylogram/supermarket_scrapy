@@ -33,7 +33,7 @@ class AllYouNeedFreshShopSpider(abstractShopSpider.AbstractShopSpider, scrapy.Sp
 
     visited = {}
     allowedVisits = 10
-    parsedProducts = {}
+    parsedProducts = []
     
     dataRegEx = re.compile('^\{"name.+')
     ingredientsRegEx = re.compile('<strong>Zutaten:<\/strong><br>(.+?)<br>')

@@ -53,7 +53,7 @@ class ReweShopSider(abstractShopSpider.AbstractShopSpider, scrapy.Spider):
     
     visited = {}
     allowedVisits = 10
-    parsedProducts = {}
+    parsedProducts = []
     
     def __init__(self, *args, **kwargs):
         super(ReweShopSider, self).__init__(*args, **kwargs)
@@ -111,7 +111,7 @@ class ReweShopSider(abstractShopSpider.AbstractShopSpider, scrapy.Spider):
     
     def getData(self, response=None, data=None):
         data = response.xpath('//script[@type="application/ld+json"]/text()')
-        data = data.ectract_first()
+        data = data.extract_first()
         if data:
             data = json.loads(data)
         return data
@@ -123,7 +123,7 @@ class ReweShopSider(abstractShopSpider.AbstractShopSpider, scrapy.Spider):
         return None
     
     def getIngredients(self, response=None, data=None):
-        ingredientString = response.xpath('//h3[contains(., "Zutaten:")/parent::div/text()]')
+        ingredientString = response.xpath('//h3[contains(., "Zutaten:")]/parent::div/text()')
         ingredientString = ingredientString.extract_first()
         if ingredientString:
             ingredientString.replace('°', '')

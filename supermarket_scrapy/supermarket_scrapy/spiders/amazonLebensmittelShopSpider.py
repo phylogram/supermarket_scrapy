@@ -8,6 +8,8 @@ Needs: python: PIL.Image
 Extern: tesseract with german language training set!
 https://github.com/tesseract-ocr/tesseract/wiki
     set tesseractDataPath and tesseractExePath in properties!
+
+A lot of 503 errors - is Amazon secretly blocking me?
 """
 from io import BytesIO
 import os
@@ -93,7 +95,7 @@ class AmazonLebensmittelShopSpider(abstractShopSpider.AbstractShopSpider, scrapy
         output = self.usualIngridientsSplitting(output)
         
         # Trying to get rid of false readings
-        for cleaner in self.ingredientRegExCleaners():
+        for cleaner in self.ingredientsRegExCleaners:
             output = [re.sub(cleaner, '', element) for element in output]
         return output # and hope for the best
     
