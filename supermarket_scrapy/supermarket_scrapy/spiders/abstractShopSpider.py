@@ -150,6 +150,7 @@ class AbstractShopSpider():
         if not ingredientString:
             return None
         else:
+            ingredientString = str(ingredientString)
             ingredients = ingredientString.replace('*', '')
             ingredients = re.sub('[\s]', ' ', ingredients)
             ingredients = re.compile('(?<=\d),(?=\d)').sub('.', ingredients)
