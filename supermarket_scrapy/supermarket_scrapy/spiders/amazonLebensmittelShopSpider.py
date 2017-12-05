@@ -112,9 +112,11 @@ class AmazonLebensmittelShopSpider(abstractShopSpider.AbstractShopSpider, scrapy
         with open(outputFile.name + '.txt', 'r') as handle:
             contents = handle.read()
         img.close()
+        file.close()
+        outputFile.close()
         os.remove(file.name)
         os.remove(outputFile.name)
-        os.remove(outputFile.name + 'txt')
+        os.remove(outputFile.name + '.txt')
         return contents
     
     def getBrand(self, response=None, data=None):

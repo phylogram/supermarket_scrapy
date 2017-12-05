@@ -91,7 +91,7 @@ class AbstractShopSpider():
             if 'unit' in size:
                     unit = size['unit']
                     if unit:
-                        unit = self.cleanString()
+                        unit = self.cleanString(unit)
                         parsedDict['details']['size']['unit'] = unit
                 
         price = self.getPrice(response=response,data=data)

@@ -80,12 +80,9 @@ class MerkurShopSpider(abstractShopSpider.AbstractShopSpider, SitemapSpider):
             returnDict['unit'] = unit
         return returnDict
     
-    def getprice(self, response=None, data=None):
+    def getPrice(self, response=None, data=None):
         returnDict = dict()    
-        price = response.xpath(
-'/html/body/main/div/div/div[1]/div[2]/div/div/div/article/div/div/div/div[2]/div/div[2]/div[1]/dd-price/div/a'
-                )
-        price = price.extract_first()
+        price = price = response.css('.price--current')
         
         mainDigits = price.xpath('./text()')
         mainDigits = mainDigits.extract_first()
