@@ -114,7 +114,7 @@ class DMShopSpider(abstractShopSpider.AbstractShopSpider, scrapy.Spider):
         ingredients = response.xpath('//dt[.="Zutaten"]/following-sibling::dd[1]')
         ingredients = ingredients.extract_first()
         if ingredients:
-            ingredients = self.zutatensubRegEx.sub('', ingredients)
+            ingredients = self.zutatenSubRegEx.sub('', ingredients)
             ingredients = self.usualIngridientsSplitting(ingredients)
         return ingredients
     

@@ -81,7 +81,7 @@ class UseChrome():
     def __init__(self):
         options = webdriver.ChromeOptions()
         #options.binary_location = '/usr/bin/chromium'
-        options.add_argument('headless')
+        #options.add_argument('headless') I don't know why - headless is extremly slow with my computer
         options.add_argument('disable-gpu')
         options.add_argument('window-size=1200x600')
         self.browser = webdriver.Chrome(chrome_options=options)
