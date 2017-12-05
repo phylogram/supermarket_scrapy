@@ -85,24 +85,29 @@ class AbstractShopSpider():
             if 'amount' in size:
                 amount = size['amount']
                 if amount:
-                    amount = self.cleanString(size['amount'])
+                    amount = self.cleanString(amount)
                     amount = float(amount)
                     parsedDict['details']['size']['amount'] = amount
             if 'unit' in size:
-                    unit = self.cleanString(size['unit'])
-                    parsedDict['details']['size']['unit'] = unit
+                    unit = size['unit']
+                    if unit:
+                        unit = self.cleanString()
+                        parsedDict['details']['size']['unit'] = unit
                 
         price = self.getPrice(response=response,data=data)
         if price:
            parsedDict['details']['price'] = dict()
            if 'amount' in price:
                    amount = price['amount']
-                   amount = self.cleanString(amount)
-                   amount = float(amount)
-                   parsedDict['details']['price']['amount'] = amount
+                   if amount:
+                       amount = self.cleanString(amount)
+                       amount = float(amount)
+                       parsedDict['details']['price']['amount'] = amount
            if 'currency' in price:
-               unit = self.cleanString(price['currency'])
-               parsedDict['details']['price']['currency'] = unit
+               currency = price['currency']
+               if currency:
+                   currency = self.cleanString(currency)
+                   parsedDict['details']['price']['currency'] = currency
                
         imageURL = self.getImageURL(response=response,data=data)
         if imageURL:
