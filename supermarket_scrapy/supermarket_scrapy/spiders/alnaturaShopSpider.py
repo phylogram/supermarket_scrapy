@@ -11,8 +11,10 @@ import supermarket_scrapy.spiders.abstractShopSpider as abstractShopSpider
 
 class AlnaturaShopSpider(abstractShopSpider.AbstractShopSpider, SitemapSpider):
     name = 'AlnaturaShop'
-    sitemap_urls = ['https://www.alnatura-shop.de/medias/PRODUCT-de-EUR-479627737118262662.xml?context=bWFzdGVyfHJvb3R8NzI2MDI1fHRleHQveG1sfGhkOS9oZTcvOTA5NjQ3ODU4ODk1OC54bWx8N2JmNzFlOWQxM2Q3YTAwMWQ5MzFiOTk1NGQ0OTdjMGVhYWE0YTBiY2U5YmYyNDJkNzkyNTZmODhkNTlmNWMwNQ']
+    sitemap_urls = ['https://www.alnatura-shop.de/sitemap.xml']
     store = 'Alnatura'
+    
+    sitemap_follow = [re.compile('product', re.IGNORECASE)]
     
     ingredientsRegEx = re.compile(' \* aus biologischer[\s]+?Landwirtschaft')
     
