@@ -101,14 +101,15 @@ class AllYouNeedFreshShopSpider(abstractShopSpider.AbstractShopSpider, scrapy.Sp
         for productLink in productLinks:
             productLink = self.base_url + productLink
             if productLink not in self.parsedProducts:
-                self.parsedProducts[productLink] = 1
+                thisTime = time.strftime('%d-%m-%Y-%H:%M')
+                self.parsedProducts.append(productLink)
                 request = scrapy.Request(productLink,
                                             callback=self.parseProduct,
                                             dont_filter=True # !!!
                                             )
                 request.meta['plz'] = plz
                 yield request
-                thisTime = time.strftime('%d-%m-%Y-%H:%M')
+                
                 message = '''°°°°°°°°°°°°°°°°°°°°\n
                              {time}\n
                              PLZ {plz}\n
@@ -119,6 +120,7 @@ class AllYouNeedFreshShopSpider(abstractShopSpider.AbstractShopSpider, scrapy.Sp
                              
                 self.logger.debug(message)
             else:
+                thisTime = time.strftime('%d-%m-%Y-%H:%M')
                 # Yes – I am afraid of infenite crawling loops!
                 message = '''$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n
                              %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n
@@ -126,13 +128,10 @@ class AllYouNeedFreshShopSpider(abstractShopSpider.AbstractShopSpider, scrapy.Sp
                              PLZ {plz}\n
                              Product allready visited: \n
                              \t {url} \n
-                             \t {number} times\n
                              %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n
                              $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n
-                             '''.format(time=thisTime, plz=plz, url=productLink, 
-                                 number=self.parsedProducts[productLink])
+                             '''.format(time=thisTime, plz=plz, url=productLink)
                 self.logger.debug(message)
-                self.parsedProducts[productLink] += 1
                 
      
     def getData(self, response=None, data=None):
@@ -166,7 +165,7 @@ class AllYouNeedFreshShopSpider(abstractShopSpider.AbstractShopSpider, scrapy.Sp
     def getBrand(self, response=None, data=None):
         if 'brand' in data:
             if 'name' in data['brand']:
-                return data['data']['brand']
+                return data['brand']['name']
         return None
 
     def getSize(self, response=None, data=None):
