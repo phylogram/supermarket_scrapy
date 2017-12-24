@@ -108,7 +108,7 @@ class AbstractShopSpider():
                if currency:
                    currency = self.cleanString(currency)
                    parsedDict['details']['price']['currency'] = currency
-               
+        parsedDict['details']['url'] = response.url      
         imageURL = self.getImageURL(response=response,data=data)
         if imageURL:
             parsedDict['details']['image_url'] = imageURL.strip()
