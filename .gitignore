@@ -3,3 +3,5 @@ __pycache__/
 .cache/
 .vagrant
 vagrant/*.retry
+
+*.log
