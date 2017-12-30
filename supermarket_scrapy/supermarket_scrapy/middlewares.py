@@ -6,10 +6,15 @@
 # http://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
 import re
+from datetime import datetime
+
 import scrapy
 from scrapy import signals
 from scrapy.exceptions import IgnoreRequest
 from selenium import webdriver
+
+
+
 
 class SupermarketScrapySpiderMiddleware(object):
     # Not all methods need to be defined. If a method is not defined,
@@ -74,20 +79,46 @@ class SkipNonProductsMeinDM():
 
 class UseChrome():
     '''
-    get requests from scrapy, uses selenium webdriver and send responses back.
-    Does not pass them to scrapy downloaders. Set Spiders Names in self.spiderNames
+    Gets requests from scrapy, uses selenium webdriver and send responses back.
+    Does not pass them to scrapy downloaders.
+    If you need chrome for a spider, add Spiders Names in self.spiderNames
     '''    
     spiderNames = ['MerkurShop', 'BillaShop']
-    def __init__(self):
-        options = webdriver.ChromeOptions()
-        #options.binary_location = '/usr/bin/chromium'
-        #options.add_argument('headless') I don't know why - headless is extremly slow with my computer
-        options.add_argument('disable-gpu')
-        options.add_argument('window-size=1200x600')
-        self.browser = webdriver.Chrome(chrome_options=options)
-
-        self.browser.implicitly_wait(2)
+    requestCount = 0
+    browsers = {}
+    
+    def __init__(self, settings):
+        self.settings = settings
         
+    def __del__(self): ### Right place to do this? To Do // Check!
+       for browser in self.browsers.values():
+           browser.quit()
+    
+    @classmethod
+    def from_crawler(cls, crawler):
+        settings = crawler.settings
+        return cls(settings)
+        
+    def getBrowser(self):
+        """handles as much browsers as concurrent requests are allowed"""
+        concurrentRequests = int(self.settings['CONCURRENT_REQUESTS'])
+        browserCount = self.requestCount % concurrentRequests
+        if browserCount in self.browsers:
+            print('browser', browserCount, datetime.strftime(datetime.now(),'%H-%M-%S'))
+            return self.browsers[browserCount]
+        else:
+            print('Starting new Browser', browserCount,
+                  datetime.strftime(datetime.now(),'%H-%M-%S'))
+            options = webdriver.ChromeOptions()
+            #options.binary_location = '/usr/bin/chromium'
+            options.add_argument('headless')
+            options.add_argument('disable-gpu')
+            options.add_argument('window-size=1200x600')
+            browser = webdriver.Chrome(chrome_options=options)
+            self.browsers[browserCount] = browser
+            browser.implicitly_wait(1)
+            return self.browsers[browserCount]
+            
     def process_request(self, request, spider):
         if spider.name not in self.spiderNames:
             return None
@@ -96,9 +127,11 @@ class UseChrome():
         elif 'robots.txt' in request.url:
             return None
         else:
-            self.browser.get(request.url)
-            response = scrapy.http.HtmlResponse(self.browser.current_url,
-                                            body=self.browser.page_source,
+            browser = self.getBrowser()
+            browser.get(request.url)
+            self.requestCount += 1
+            response = scrapy.http.HtmlResponse(browser.current_url,
+                                            body=browser.page_source,
                                             encoding='utf-8',
                                             request=request)
             return response
@@ -115,7 +148,7 @@ class UseChromePostalCodes():
     def getNewBrowser(self):
         options = webdriver.ChromeOptions()
         #options.binary_location = '/usr/bin/chromium'
-        #options.add_argument('headless') doesn't work with headless ? bug?
+        options.add_argument('headless') 
         options.add_argument('disable-gpu')
         options.add_argument('window-size=1200x600')
         browser = webdriver.Chrome(chrome_options=options)

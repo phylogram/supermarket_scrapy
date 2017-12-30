@@ -21,6 +21,7 @@ class LebensmittelShopSpider(abstractShopSpider.AbstractShopSpider, scrapy.Spide
     productCountXPATH = '//span[@id="ProdCount"]/text()'
     gtinRegEx = re.compile('(\d{13})\D')
     priceAmountRegEx = re.compile('(\d+,{0,1}\d*)')
+    biologischerAnbauRegEx = re.compile('aus kontrolliert biologischem anbau', flags=re.IGNORECASE)
 
     def __init__(self, *args, **kwargs):
         super(LebensmittelShopSpider, self).__init__(*args, **kwargs)
@@ -95,6 +96,7 @@ class LebensmittelShopSpider(abstractShopSpider.AbstractShopSpider, scrapy.Spide
     def getIngredients(self, response=None, data=None):
         ingredients = response.css('div .enummerZutaten')
         ingredients = ingredients.extract_first()
+        ingredients = re.sub(self.biologischerAnbauRegEx, ' ', ingredients)
         ingredients = self.usualIngridientsSplitting(ingredients)
         return ingredients
 

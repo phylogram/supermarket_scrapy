@@ -34,8 +34,9 @@ class MeinDMatShopSpider(abstractShopSpider.AbstractShopSpider, SitemapSpider):
 
     def getIngredients(self, response=None, data=None):
         'nothing special to replace here'
-        ingredientString = response.css('.tab-ingredients')
-        ingredientString = ingredientString.extract_first()
+        ingredientSelector = response.css('.tab-ingredients')
+        ingredientSelector = ingredientSelector.xpath('.//p')
+        ingredientString = ingredientSelector.extract_first()
         ingredientString = self.usualIngridientsSplitting(ingredientString)
         return ingredientString
 

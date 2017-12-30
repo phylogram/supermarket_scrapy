@@ -23,8 +23,10 @@ class BillaShopSpider(abstractShopSpider.AbstractShopSpider, SitemapSpider):
     sitemap_urls = ['https://shop.billa.at/sitemap']
     store = ['Billa']
     
+    zutatenRegEx = re.compile('Zutaten.*?:')
     producerRegEx = re.compile('Name:\s+?(\w.*?)<', flags=re.DOTALL)
-
+    sizeRegEx = re.compile('Nettogehalt:\s+?(\d+\.{0,1}\d*)\s+?([a-zA-Z]+)')
+    
     def __init__(self, *args, **kwargs):
         super(BillaShopSpider, self).__init__(*args, **kwargs)
         self._setOUTPUT_()
@@ -45,8 +47,16 @@ class BillaShopSpider(abstractShopSpider.AbstractShopSpider, SitemapSpider):
     def getIngredients(self, response=None, data=None):
         ingredients = data.xpath('.//h2[.="Zutaten"]/following-sibling::div/text()')
         ingredients = ingredients.extract_first()
+        if not ingredients:
+            return None
+        ingredients = re.sub(self.zutatenRegEx, '', ingredients)
+        ingredients = self.zutatenRegEx.sub('', ingredients)
         ingredients = self.usualIngridientsSplitting(ingredients)
         return ingredients
+
+    def getLabels(self, response=None, data=None):
+        response = response.xpath('//div[@itemtype="http://schema.org/Product"]')
+        return super(BillaShopSpider, self).getLabels(response=response)
 
     def getGtin(self, response=None, data=None):
         'I believe the article id (at the end of the url) is the gtin-8'
@@ -80,7 +90,23 @@ class BillaShopSpider(abstractShopSpider.AbstractShopSpider, SitemapSpider):
         else:
             return None
 
-    # Size: At the moment I see too many different ways how they describe size in languages
+    def getSize(self, response=None, data=None):
+        returnDict = dict()
+        size = data.re(self.sizeRegEx)
+        if len(size) != 2:
+            return None
+        for item in size:
+            if type(item) != str:
+                return None
+        amount, unit = size
+        unit = unit.lower() # Gram -> gram
+        if unit in self.units:  # gram -> g
+            unit = self.units[unit]
+        elif unit not in self.units.values():
+            return None  # unknown
+        returnDict['amount'] = amount
+        returnDict['unit'] = unit
+        return returnDict
 
     def getPrice(self, response=None, data=None):
         returnDict = dict()
@@ -92,7 +118,7 @@ class BillaShopSpider(abstractShopSpider.AbstractShopSpider, SitemapSpider):
         currency = currency.extract_first()
         if currency:
             returnDict['currency'] = currency
-        return currency
+        return returnDict
 
     def getImageURL(self, response=None, data=None):
         imgURL = data.xpath('//*[@itemprop="image"]/@src')

@@ -58,7 +58,7 @@ class MyTimeShopSpider(abstractShopSpider.AbstractShopSpider, SitemapSpider):
         return producer
     
     def getCategory(self, response=None, data=None):
-        category = response.xpath('./meta[@itemprop="category"]/@content')
+        category = data.xpath('./meta[@itemprop="category"]/@content')
         category = category.extract_first()
         return category
     
@@ -74,11 +74,11 @@ class MyTimeShopSpider(abstractShopSpider.AbstractShopSpider, SitemapSpider):
     
     def getPrice(self, response=None, data=None):
         returnDict = dict()    
-        amount = response.xpath('./meta[@property="product:price:amount"]/@content')
+        amount = data.xpath('./meta[@property="product:price:amount"]/@content')
         amount = amount.extract_first()
         if amount:
             returnDict['amount'] = amount
-        currency = currency = response.xpath('./meta[@property="product:price:currency"]/@content')
+        currency = data.xpath('./meta[@property="product:price:currency"]/@content')
         currency = currency.extract_first()
         if currency:
             returnDict['currency'] = currency
