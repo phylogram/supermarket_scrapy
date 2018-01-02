@@ -20,36 +20,37 @@ class AbstractShopSpider():
     store = None
     name = None
     labels = labels.labels
-    listOutputDirectory = '../../../../newData/mapping/'
-    
+    listOutputDirectory = '/media/phylogram/Programme/moreOnion/supermarktScrapy/newData/mapping/'
+
     whiteSpaceRegEx = re.compile('[\s]+')
-    htmlTagRegEx = re.compile('(<\/*?\w.+?>)')
+    htmlTagRegEx = re.compile('(<\/{0,1}\w.*?>)')
     decimalSepRegEx = re.compile('(?<=\d),(?=\d)')
     splitIngredientsRegEx = re.compile(',\s*(?![^()]*\))')
-    kannSpurenRegEx = re.compile('Kann Spuren .+? enthalten')
+    kannSpurenRegEx = re.compile('Kann .+? enthalten')
     delNoneDecDotsRegEx = re.compile('(?<!\d)\.(?!\d)')
     footnoteRegEx = re.compile('[\*°]\s*?aus.+')
     zutatenRegEx = re.compile('zutaten:', re.IGNORECASE)
-    #there is a german unit 
+    beforeColonRegEx = re.compile('[a-zA-Z]+?:')
+    # there is a german unit
     units = cleanString.units
-    
-    
-    def _setOUTPUT_(self):  
+
+
+    def _setOUTPUT_(self):
         self.ressourcesOUTPUT = set()
         self.labelsOUTPUT = set()
         self.brandsOUTPUT = set()
 
-    
+
     def parseProduct(self, response):
         ''''parses Products as schema.json - the actual parsing functions will be
         overriden in the spider subclasses'''
-        
         parsedDict = dict()
         data = self.getData(response)
         name = self.getName(response=response,data=data)
         if name:
             parsedDict['name'] = cleanString.cleanString(name)
         else:
+            self.logger.critical('No name ' + response.url)
             return None
         ingredients = self.getIngredients(response=response,data=data)
         if ingredients:
@@ -66,10 +67,10 @@ class AbstractShopSpider():
                 self.labelsOUTPUT.add(label)
         else:
             parsedDict['labels'] = []
-        store = self.getStores(response=response,data=data)
+        store = self.getStores(response=response, data=data)
         if store:
             parsedDict['stores'] = store
-        gtin = self.getGtin(response=response,data=data)
+        gtin = self.getGtin(response=response, data=data)
         if gtin:
             parsedDict['gtin'] = cleanString.cleanString(gtin)
         brand = self.getBrand(response=response,data=data)
@@ -83,7 +84,7 @@ class AbstractShopSpider():
         category = self.getCategory(response=response,data=data)
         if category:
             parsedDict['category'] = cleanString.cleanString(category)
-            
+
         parsedDict['details'] = dict()
         size = self.getSize(response=response,data=data)
         if size:
@@ -92,6 +93,7 @@ class AbstractShopSpider():
                 amount = size['amount']
                 if amount:
                     amount = cleanString.cleanString(amount)
+                    amount = re.sub(self.decimalSepRegEx, '.', amount)
                     amount = float(amount)
                     parsedDict['details']['size']['amount'] = amount
             if 'unit' in size:
@@ -99,7 +101,7 @@ class AbstractShopSpider():
                     if unit:
                         unit = cleanString.cleanString(unit)
                         parsedDict['details']['size']['unit'] = unit
-                
+
         price = self.getPrice(response=response,data=data)
         if price:
            parsedDict['details']['price'] = dict()
@@ -107,6 +109,7 @@ class AbstractShopSpider():
                    amount = price['amount']
                    if amount:
                        amount = cleanString.cleanString(amount)
+                       amount = re.sub(self.decimalSepRegEx, '.', amount)
                        amount = float(amount)
                        parsedDict['details']['price']['amount'] = amount
            if 'currency' in price:
@@ -114,16 +117,16 @@ class AbstractShopSpider():
                if currency:
                    currency = cleanString.cleanString(currency)
                    parsedDict['details']['price']['currency'] = currency
-        parsedDict['details']['url'] = response.url      
+        parsedDict['details']['url'] = response.url
         imageURL = self.getImageURL(response=response,data=data)
         if imageURL:
             parsedDict['details']['image_url'] = imageURL.strip()
-        
+
         yield parsedDict
-     
-        
+
+
     # Dummy get data methods
-    # All of them get self, response and data    
+    # All of them get self, response and data
     def getData(self, response=None, data=None):
         'Any structured data parts from the website'
         return None
@@ -164,7 +167,7 @@ class AbstractShopSpider():
         return None
     def getImageURL(self, response=None, data=None):
         return None
-    
+
     # usual methods for all subchilds
     def usualIngridientsSplitting(self, ingredientString):
         '''The most typical ingredients splitting and cleaning.
@@ -174,6 +177,7 @@ class AbstractShopSpider():
             return None
         else:
             ingredients = str(ingredientString)
+            ingredients = re.sub(self.beforeColonRegEx, ' ', ingredients)
             ingredients = re.sub(self.footnoteRegEx, ' ', ingredients)
             ingredients = re.sub(self.zutatenRegEx, ' ', ingredients)
             ingredients = ingredients.replace('*', ' ')
@@ -184,7 +188,7 @@ class AbstractShopSpider():
                                                     # only works if not broken!
             ingredients = html.unescape(ingredients)
             ingredients = re.sub(self.kannSpurenRegEx, '', ingredients)
-            ingredients = re.sub(self.delNoneDecDotsRegEx, '', ingredients) 
+            ingredients = re.sub(self.delNoneDecDotsRegEx, '', ingredients)
             ingredients = re.split(self.splitIngredientsRegEx, ingredients)
             ingredients = [element.strip() for element in ingredients]
             ingredientList = list()
@@ -193,15 +197,15 @@ class AbstractShopSpider():
                     ingredientList.append(ingredient)
             # ingredients = list(set(ingredients)) # make them unique /changes order
             ingredients = list(filter(None, ingredientList)) # delete empty items
-            return ingredients 
-        
+            return ingredients
+
     def closed(self, message):
         directory = self.listOutputDirectory + os.sep
         thisTime = time.strftime('%d-%m-%Y_%H-%M')
         brandsFileName = directory + '_'.join([self.name, 'brands', thisTime]) + '.txt'
         ressourcesFileName = directory + '_'.join([self.name, 'ressources', thisTime]) + '.txt'
         labelsFileName = directory + '_'.join([self.name, 'labels', thisTime]) + '.txt'
-        
+
         with codecs.open(brandsFileName, mode='w',encoding='utf-8', errors='namereplace') as file:
             file.write('\n'.join(self.brandsOUTPUT))
         with codecs.open(ressourcesFileName, mode='w', encoding='utf-8', errors='namereplace') as file:

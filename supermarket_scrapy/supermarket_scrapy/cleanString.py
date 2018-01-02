@@ -10,7 +10,7 @@ import html
 import re
 from urllib import parse
 
-whiteSpaceRegEx = re.compile('[\s]')
+whiteSpaceRegEx = re.compile('[\s]+')
 htmlTagRegEx = re.compile('<\/{0,1}\w.*?>')
 
 def cleanString(string):
@@ -20,14 +20,14 @@ def cleanString(string):
     string = str(string)
     string = re.sub(whiteSpaceRegEx, ' ', string)
     string = html.unescape(string)
-    string = re.sub(htmlTagRegEx, '', string)
+    string = re.sub(htmlTagRegEx, ' ', string)
     string = codecs.encode(string)
     string = codecs.decode(string, encoding='utf-8', errors='namereplace')
     string = parse.unquote(string)
     string = string.strip()
-    return string       
+    return string
 
-units = {           
+units = {
             #zeitmaße
             "stunde": "h",
             "minute": "min",
@@ -70,5 +70,5 @@ units = {
             "gramm": "g",
             "dezigramm": "dg",
             "zentigramm": "cg",
-            "milligramm": "mg",            
+            "milligramm": "mg",
             }

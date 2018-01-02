@@ -9,10 +9,10 @@ Needs: Downloader Middleware: 'supermarket_scrapy.middlewares.useChrome'
 Needs: selenium Chrome
 
 chrome warning: A parser blocking cross site script [...] is invoked via document.write.
-The network request MAY be blocked in the browser in this or a future load due to poor 
+The network request MAY be blocked in the browser in this or a future load due to poor
 network connectivity. [...]
 
-super slow!!!!! 
+super slow!!!!!
 """
 import re
 from scrapy.spiders import SitemapSpider
@@ -22,19 +22,19 @@ class BillaShopSpider(abstractShopSpider.AbstractShopSpider, SitemapSpider):
     name = 'BillaShop'
     sitemap_urls = ['https://shop.billa.at/sitemap']
     store = ['Billa']
-    
+
     zutatenRegEx = re.compile('Zutaten.*?:')
     producerRegEx = re.compile('Name:\s+?(\w.*?)<', flags=re.DOTALL)
     sizeRegEx = re.compile('Nettogehalt:\s+?(\d+\.{0,1}\d*)\s+?([a-zA-Z]+)')
-    
+
     def __init__(self, *args, **kwargs):
         super(BillaShopSpider, self).__init__(*args, **kwargs)
         self._setOUTPUT_()
-        
+
     def parse(self, response):
         for product in self.parseProduct(response):
             yield product
-  
+
     def getData(self, response=None, data=None):
         data = response.xpath('//div[@itemtype="http://schema.org/Product"]')
         return data
@@ -53,10 +53,6 @@ class BillaShopSpider(abstractShopSpider.AbstractShopSpider, SitemapSpider):
         ingredients = self.zutatenRegEx.sub('', ingredients)
         ingredients = self.usualIngridientsSplitting(ingredients)
         return ingredients
-
-    def getLabels(self, response=None, data=None):
-        response = response.xpath('//div[@itemtype="http://schema.org/Product"]')
-        return super(BillaShopSpider, self).getLabels(response=response)
 
     def getGtin(self, response=None, data=None):
         'I believe the article id (at the end of the url) is the gtin-8'

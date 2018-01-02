@@ -60,7 +60,7 @@ DOWNLOADER_MIDDLEWARES = {
     'supermarket_scrapy.middlewares.EdekaFilter': 548,
     'supermarket_scrapy.middlewares.BillaShopFilter': 549,
 }
-
+FEED_EXPORT_ENCODING = 'utf-8'
 # Enable or disable extensions
 # See http://scrapy.readthedocs.org/en/latest/topics/extensions.html
 #EXTENSIONS = {
