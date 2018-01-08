@@ -37,7 +37,7 @@ for item in labelsJSON['items']:
 # get more labels from http://www.ecolabelindex.com/ecolabels
 r = requests.get(elURL)
 response = HtmlResponse(elURL, body=r.text, encoding='utf-8')
-labelDescField = response.xpath('//td/h4[@class="cuddle"]/a')   
+labelDescField = response.xpath('//td/h4[@class="cuddle"]/a')
 for value in labelDescField.extract():
     value = value.lower()
     value = cleanString.cleanString(value)
@@ -49,12 +49,12 @@ for value in labelDescField.extract():
     if not value:
         continue
     values.add(value)
-    
+
 # Make RegExes!
 for value in values:
     if len(value) < 3:
         continue
-    
+
     # The following is too slow
     # lower = value
     # cap = value.capitalize() #SLOW
@@ -72,8 +72,8 @@ for value in values:
     #cap = ' '.join(capList)
     #allCap = value.upper()
     #regExString = regExTemplate.format(lowercase=lower, cap=cap, allCap=allCap)
-    regExString = regExTemplate.format(label=value,  flags=re.IGNORECASE)
-    regEx = re.compile(regExString)
+    regExString = regExTemplate.format(label=value)
+    regEx = re.compile(regExString, flags=re.IGNORECASE)
     labels[value] = regEx
 
 
@@ -147,4 +147,3 @@ for value in values:
  'FAIRTRADE',
  'FAIRTRADE',
  'FAIRTRADE'] """
-     
