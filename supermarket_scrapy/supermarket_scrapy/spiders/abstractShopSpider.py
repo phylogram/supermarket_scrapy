@@ -16,17 +16,19 @@ import time
 
 import supermarket_scrapy. labels as labels
 import supermarket_scrapy.cleanString as cleanString
+
+
 class AbstractShopSpider():
     store = None
     name = None
     labels = labels.labels
-    listOutputDirectory = '/media/phylogram/Programme/moreOnion/supermarktScrapy/newData/mapping/'
+    listOutputDirectory = '/media/phylogram/Programme/moreOnion/supermarktScrapy/newData2/mapping/'
 
     whiteSpaceRegEx = re.compile('[\s]+')
     htmlTagRegEx = re.compile('(<\/{0,1}\w.*?>)')
     decimalSepRegEx = re.compile('(?<=\d),(?=\d)')
     splitIngredientsRegEx = re.compile(',\s*(?![^()]*\))')
-    kannSpurenRegEx = re.compile('Kann .+? enthalten')
+    kannSpurenRegEx = re.compile('kann .+? enthalten', re.IGNORECASE)
     delNoneDecDotsRegEx = re.compile('(?<!\d)\.(?!\d)')
     footnoteRegEx = re.compile('[\*°]\s*?aus.+')
     zutatenRegEx = re.compile('zutaten:', re.IGNORECASE)
