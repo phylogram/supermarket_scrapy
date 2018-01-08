@@ -12,8 +12,9 @@ import scrapy
 from scrapy import signals
 from scrapy.exceptions import IgnoreRequest
 from selenium import webdriver
-
-
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 
 class SupermarketScrapySpiderMiddleware(object):
@@ -64,7 +65,7 @@ class SupermarketScrapySpiderMiddleware(object):
         spider.logger.info('Spider opened: %s' % spider.name)
 
 
-class SkipNonProductsMeinDM(): 
+class SkipNonProductsMeinDM():
     'filters products for DM'
     categoryURL = 'https://www.meindm.at/ernaehrung/'
     def process_request(self, request, spider):
@@ -75,50 +76,63 @@ class SkipNonProductsMeinDM():
             if not(sitemap or category or robot):
                 raise IgnoreRequest
         return None
-    
+
 
 class UseChrome():
     '''
     Gets requests from scrapy, uses selenium webdriver and send responses back.
     Does not pass them to scrapy downloaders.
     If you need chrome for a spider, add Spiders Names in self.spiderNames
-    '''    
+    '''
     spiderNames = ['MerkurShop', 'BillaShop']
     requestCount = 0
     browsers = {}
-    
+
     def __init__(self, settings):
         self.settings = settings
-        
+        options = webdriver.ChromeOptions()
+        #options.binary_location = '/usr/bin/chromium'
+        options.add_argument('headless')
+        options.add_argument('disable-gpu')
+        options.add_argument('window-size=1200x600')
+        browser = webdriver.Chrome(chrome_options=options)
+        self.browsers[0] = browser
+        #browser.implicitly_wait(1)
+        self.BillaWait = EC.presence_of_element_located((By.CLASS_NAME, "product-detail__tabs"))
+        self.MerkurWait = EC.presence_of_element_located((By.CLASS_NAME, "tabs__title"))
+        self.waits = {'MerkurShop': self.MerkurWait, 'BillaShop': self.BillaWait}
+
     def __del__(self): ### Right place to do this? To Do // Check!
        for browser in self.browsers.values():
            browser.quit()
-    
+
     @classmethod
     def from_crawler(cls, crawler):
         settings = crawler.settings
         return cls(settings)
-        
+
     def getBrowser(self):
-        """handles as much browsers as concurrent requests are allowed"""
-        concurrentRequests = int(self.settings['CONCURRENT_REQUESTS'])
-        browserCount = self.requestCount % concurrentRequests
-        if browserCount in self.browsers:
-            print('browser', browserCount, datetime.strftime(datetime.now(),'%H-%M-%S'))
-            return self.browsers[browserCount]
-        else:
-            print('Starting new Browser', browserCount,
-                  datetime.strftime(datetime.now(),'%H-%M-%S'))
-            options = webdriver.ChromeOptions()
-            #options.binary_location = '/usr/bin/chromium'
-            options.add_argument('headless')
-            options.add_argument('disable-gpu')
-            options.add_argument('window-size=1200x600')
-            browser = webdriver.Chrome(chrome_options=options)
-            self.browsers[browserCount] = browser
-            browser.implicitly_wait(1)
-            return self.browsers[browserCount]
-            
+        """ Just gets a browser - was designed to handle multiple browsers, but blocks without twisted"""
+        #"""handles as much browsers as concurrent requests are allowed"""
+        #concurrentRequests = int(self.settings['CONCURRENT_REQUESTS'])
+        #browserCount = self.requestCount % concurrentRequests
+        #if browserCount in self.browsers:
+        #    print('browser', browserCount, datetime.strftime(datetime.now(),'%H-%M-%S'))
+        #    return self.browsers[browserCount]
+        #else:
+        #    print('Starting new Browser', browserCount,
+        #          datetime.strftime(datetime.now(),'%H-%M-%S'))
+        #    options = webdriver.ChromeOptions()
+        #    #options.binary_location = '/usr/bin/chromium'
+        #    options.add_argument('headless')
+        #    options.add_argument('disable-gpu')
+        #    options.add_argument('window-size=1200x600')
+        #    browser = webdriver.Chrome(chrome_options=options)
+        #    self.browsers[browserCount] = browser
+        #    #browser.implicitly_wait(1)
+        #    return self.browsers[browserCount]
+        return self.browsers[0]
+
     def process_request(self, request, spider):
         if spider.name not in self.spiderNames:
             return None
@@ -128,14 +142,19 @@ class UseChrome():
             return None
         else:
             browser = self.getBrowser()
+            wait = self.waits[spider.name]
             browser.get(request.url)
-            self.requestCount += 1
-            response = scrapy.http.HtmlResponse(browser.current_url,
+            try:
+                WebDriverWait(browser, 10).until(wait)
+                response = scrapy.http.HtmlResponse(browser.current_url,
                                             body=browser.page_source,
                                             encoding='utf-8',
                                             request=request)
-            return response
-        
+                return response
+            except Exception as e:
+                print(e)
+                return None # So in this case we try the default downloader anyway ...
+
 
 class UseChromePostalCodes():
     '''
@@ -148,7 +167,7 @@ class UseChromePostalCodes():
     def getNewBrowser(self):
         options = webdriver.ChromeOptions()
         #options.binary_location = '/usr/bin/chromium'
-        options.add_argument('headless') 
+        options.add_argument('headless')
         options.add_argument('disable-gpu')
         options.add_argument('window-size=1200x600')
         browser = webdriver.Chrome(chrome_options=options)
@@ -184,7 +203,7 @@ class UseChromePostalCodes():
                 #Say ok/go
                 goButton = browser.find_element_by_id('mc-success-trigger')
                 goButton.click()
-            
+
         response = scrapy.http.HtmlResponse(browser.current_url,
                                             body=browser.page_source,
                                             encoding='utf-8',
@@ -193,7 +212,7 @@ class UseChromePostalCodes():
     def __del__(self): ### Right place to do this? To Do // Check!
        for browser in self.browsers.values():
            browser.quit()
-       
+
 class MyTimeShopFilter():
     'filters requests'
     spiderNames = ['MyTimeShop']
@@ -204,7 +223,7 @@ class MyTimeShopFilter():
                 raise IgnoreRequest
         else:
             return None
-        
+
 class EdekaFilter():
     'filters requests'
     food = re.compile('/Lebensmittel/')
@@ -214,7 +233,7 @@ class EdekaFilter():
             return None
         isFood = re.match(self.food, request.url)
         hasNoCategory = re.match(self.noCategory, request.url)
-        
+
         if isFood or hasNoCategory:
             return None # pass
         else:
@@ -233,6 +252,5 @@ class BillaShopFilter():
             if 'warengruppe' not in request.url:
                 raise IgnoreRequest
         return None
-    
-    
-    
+
+

@@ -22,7 +22,7 @@ class AbstractShopSpider():
     store = None
     name = None
     labels = labels.labels
-    listOutputDirectory = '/media/phylogram/Programme/moreOnion/supermarktScrapy/newData2/mapping/'
+    listOutputDirectory = '/media/phylogram/Programme/moreOnion/supermarktScrapy/newData3/mapping/'
 
     whiteSpaceRegEx = re.compile('[\s]+')
     htmlTagRegEx = re.compile('(<\/{0,1}\w.*?>)')
