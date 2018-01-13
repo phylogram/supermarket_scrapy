@@ -12,7 +12,7 @@ class LebensmittelShopSpider(abstractShopSpider.AbstractShopSpider, scrapy.Spide
     name = 'LebensmittelShop'
     start_urls = ['https://www.lebensmittel.de/?subd=0']
     store = 'Lebensmittel.de'
-    
+
     productLinkXPATH = '//a[starts-with(@id, "detail_link")]/@href'
     mainCategoryLinkCSS = 'a.menuLink::attr(href)'
     getParamRegEx = re.compile('https:\/\/www\.lebensmittel\.de\/\?p=produktliste&CatLevel=1&subd=0&CatID=(\d+)')
@@ -26,9 +26,9 @@ class LebensmittelShopSpider(abstractShopSpider.AbstractShopSpider, scrapy.Spide
     def __init__(self, *args, **kwargs):
         super(LebensmittelShopSpider, self).__init__(*args, **kwargs)
         self._setOUTPUT_()
-    
+
     def parse(self, response):
-        # get CategoryLinks        
+        # get CategoryLinks
         categoryLinks = response.css(self.mainCategoryLinkCSS)
         # call Page 1
         for categoryLink in categoryLinks:
@@ -62,7 +62,7 @@ class LebensmittelShopSpider(abstractShopSpider.AbstractShopSpider, scrapy.Spide
                                               page=page,
                                               CatID=CatID)
             yield response.follow(url, callback=self.parseProducts)
-    
+
     def parseProducts(self, response):
         productLinks = response.xpath(self.productLinkXPATH).extract()
         if productLinks:
@@ -70,7 +70,7 @@ class LebensmittelShopSpider(abstractShopSpider.AbstractShopSpider, scrapy.Spide
                 productLink += '&reiter=1'
                 yield response.follow(productLink,
                                       callback=self.preParseProduct
-                                      )  
+                                      )
 
     def preParseProduct(self, response):
         # chain requests / for this it is easier then selenium
@@ -80,14 +80,14 @@ class LebensmittelShopSpider(abstractShopSpider.AbstractShopSpider, scrapy.Spide
         request = scrapy.Request(ajax, callback=self.parseProduct)
         request.meta['mainResponse'] = response.text
         yield request
-        
+
     def getName(self, response=None, data=None):
         # We put this selector from the first response in a property
         # because this is the firast call with the second response
         # This is workaround ... ## To Do
         mainSelector = scrapy.Selector(text=response.meta['mainResponse'])
         self.mainSelector = mainSelector
-        
+
         # Now we'll get the name ...
         name = response.xpath('//div[contains(./div/text(), "Produktbezeichnung")]')
         name = name.extract_first()
@@ -96,8 +96,9 @@ class LebensmittelShopSpider(abstractShopSpider.AbstractShopSpider, scrapy.Spide
     def getIngredients(self, response=None, data=None):
         ingredients = response.css('div .enummerZutaten')
         ingredients = ingredients.extract_first()
-        ingredients = re.sub(self.biologischerAnbauRegEx, ' ', ingredients)
-        ingredients = self.usualIngridientsSplitting(ingredients)
+        if ingredients:
+            ingredients = re.sub(self.biologischerAnbauRegEx, ' ', ingredients)
+            ingredients = self.usualIngridientsSplitting(ingredients)
         return ingredients
 
     def getLabels(self, response=None, data=None):
@@ -129,7 +130,7 @@ class LebensmittelShopSpider(abstractShopSpider.AbstractShopSpider, scrapy.Spide
                                             )
         producer = producer.extract_first()
         return producer
-    
+
     def getSize(self, response=None, data=None):
         returnDict = dict()
         size = self.mainSelector.xpath(
