@@ -21,7 +21,7 @@ class IntersparShop(abstractShopSpider.AbstractShopSpider, Spider):
     start_urls = ['https://www.interspar.at/shop/lebensmittel/search/?sp_cs=UTF-8&q=*&rank=prod-rank&page=1']
     nextPageRegEx = re.compile('"next" : "(.+?)"')
     sizeRegEx = re.compile('(\d+?)\s*?([a-zA-Z]+)')
-
+    store = ['Interspar']
     def __init__(self, *args, **kwargs):
         super(IntersparShop, self).__init__(*args, **kwargs)
         self._setOUTPUT_()
