@@ -54,7 +54,8 @@ class ReweShopSider(abstractShopSpider.AbstractShopSpider, scrapy.Spider):
     visited = {}
     allowedVisits = 10
     parsedProducts = []
-
+    store = 'Rewe'
+    
     def __init__(self, *args, **kwargs):
         super(ReweShopSider, self).__init__(*args, **kwargs)
         self._setOUTPUT_()
