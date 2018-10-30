@@ -105,3 +105,8 @@ class UnimarktShopSpider(abstractShopSpider.AbstractShopSpider, Spider):
         if imgURL:
             imgURL = self.start_urls[0] + imgURL[1:]  # Get rid of starting /
         return imgURL
+
+    def getLabels(self, response=None, data=None):
+        custom_selector = response.css('.produktDetailContainer')
+        super().getLabels(custom_selector, data)
+

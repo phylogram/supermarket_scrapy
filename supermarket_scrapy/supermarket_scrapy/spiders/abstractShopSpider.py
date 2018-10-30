@@ -14,7 +14,7 @@ import re
 import time
 
 
-import supermarket_scrapy. labels as labels
+import supermarket_scrapy.labels as labels
 import supermarket_scrapy.cleanString as cleanString
 
 
