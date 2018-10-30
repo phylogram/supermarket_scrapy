@@ -83,7 +83,10 @@ class IntersparShop(abstractShopSpider.AbstractShopSpider, Spider):
         ingredients = response.css('.ingredientInformation li.desc')
         ingredients = ingredients.extract_first()
         if ingredients:
-            ingredients = self.usualIngridientsSplitting(ingredients)
+            if 'Zutaten' in ingredients.extract_first():
+                ingredients = self.usualIngridientsSplitting(ingredients)
+            else:
+                ingredients = None
         return ingredients
 
     def getBrand(self, response=None, data=None):
