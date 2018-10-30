@@ -16,7 +16,7 @@ import supermarket_scrapy.cleanString as cleanString
 scURL = 'https://api.supplychainge.org/api/v1/labels'
 elURL = 'http://www.ecolabelindex.com/ecolabels/?st=category,food'
 
-values = set('bio') # add here labels you want to include manually. Don't forget: lowercase
+values = {'bio'} # add here labels you want to include manually. Don't forget: lowercase
 """ A set of labels {fullname lower}"""
 labels = dict()
 """ A dict of RegExes for any thinkable context - see below {lowercase_fullname: regex}"""
@@ -52,7 +52,7 @@ for value in labelDescField.extract():
 
 # Make RegExes!
 for value in values:
-    if len(value) < 3:
+    if len(value) < 2:
         continue
 
     # The following is too slow
