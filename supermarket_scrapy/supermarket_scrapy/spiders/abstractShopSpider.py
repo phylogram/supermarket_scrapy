@@ -32,7 +32,7 @@ class AbstractShopSpider():
     delNoneDecDotsRegEx = re.compile('(?<!\d)\.(?!\d)')
     footnoteRegEx = re.compile('[\*°]\s*?aus.+')
     zutatenRegEx = re.compile('zutaten:', re.IGNORECASE)
-    beforeColonRegEx = re.compile('[a-zA-Z]+?:')
+    beforeColonRegEx = re.compile('[a-zA-ZöäüÖÄÜéúíóáýÉÚÍÓÁÝèùìòàỳÈÙÌÒÀỲ]+?:') # I would prefere \p{L} but thid does not work in python
     # there is a german unit
     units = cleanString.units
 
