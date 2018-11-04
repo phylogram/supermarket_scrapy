@@ -23,7 +23,7 @@ labels = dict()
 
 # To slow: regExTemplate = '((?<![a-z0-9]){lowercase}(?![a-z0-9])|(?<![A-Z0-9]){cap}(?![a-z0-9])|(?<![A-Z0-9]){allCap}(?![A-Z0-9]))'
 # """ See Test below (commentary) """
-regExTemplate = '[\W\n]{{1}}{label}[\W\n]{{1}}'
+regExTemplate = '([\W\n]{{1}}{label}[\W\n]{{1}}|^{label}[\W\n]{{1}}|[\W\n]{{1}}${label})'
 openingParRegEx = re.compile('\s*\(.*')
 """ finds opening Parantheses and deletes them and everything beyond"""
 # get our labels from supplychainge
